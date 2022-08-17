@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <el-radio-group v-model="radio1" :fill="checkedColor">
+			<el-radio-button label="上海"></el-radio-button>
+			<el-radio-button label="北京"></el-radio-button>
+			<el-radio-button label="广州"></el-radio-button>
+			<el-radio-button label="深圳"></el-radio-button>
+    	</el-radio-group>
+    </div>
+    <script>
+		new Vue({
+		    el: '#app',
+		    data: function() {
+		        return {
+		        	radio1: '上海',
+		        	checkedColor: '#ff0000'
+		        }
+		    }
+		})
+	</script>
+</body>
+</html>
