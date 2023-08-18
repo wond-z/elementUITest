@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./lib/element-ui/lib/theme-chalk/index.css" />
+    <script src="./lib/vue.min.js"></script>
+    <script src="./lib/element-ui/lib/index.js"></script>
+    <script src="./lib/xlsx.core.min.js"></script>
+    <script src="./lib/xlsxStyle.core.min.js"></script>
+    <script src="./lib/xlsxStyle.utils.js"></script>
+    <script src="./lib/FileSaver.js"></script>
+    <script>
+        String.prototype.colorHex = function () {
+            // RGB颜色值的正则
+            var reg = /^(rgb|RGB)/;
+            var color = this;
+            if (reg.test(color)) {
+                var strHex = "#";
+                // 把RGB的3个数值变成数组
+                var colorArr = color.replace(/(?:\(|\)|rgb|RGB)*/g, "").split(",");
+                // 转成16进制
+                for (var i = 0; i < colorArr.length; i++) {
+                    var hex = Number(colorArr[i]).toString(16);
+                    if (hex === "0") {
+                        hex += hex;
+                    }
+                    strHex += hex;
+                }
+                return strHex;
+            } else {
+                return String(color);
+            }
+        };
+    </script>
+    <style>
+        #app .el-table thead {
+            color: red;
+            font-weight: 500;
+        }
+
+        #app .el-table td:nth-child(even) {
+            background: #B2DFEE;
+        }
+
+        #app .el-table td:nth-child(odd) {
+            background: #6293BB;
+        }
+
+        /*表格header的背景色*/
+        #app .el-table__header th,
+        .el-table__header tr {
+            background: orange;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <el-button @click="exportToExcel">导出表格</el-button>
+        <el-table ref="rw_table" :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+            :height="tableHeight">
+            <el-table-column type="index" width="50"></el-table-column>
+            <el-table-column label="信息">
+                <el-table-column prop="date" label="日期" width="150"></el-table-column>
+                <el-table-column prop="name" label="姓名" width="120"></el-table-column>
+                <el-table-column prop="province" label="省份" width="120"></el-table-column>
+                <el-table-column prop="city" label="市区" width="120"></el-table-column>
+            </el-table-column>
+            <el-table-column prop="address" label="地址" width="300"></el-table-column>
+            <el-table-column prop="address" label="地址" width="100"></el-table-column>
+            <el-table-column prop="address" label="地址" width="300"></el-table-column>
+            <el-table-column prop="address" label="地址" width="300"></el-table-column>
+            <el-table-column prop="zip" label="邮编"></el-table-column>
+        </el-table>
+        <div class="block" style="margin-top:15px;"></div>
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
+            :page-sizes="[10, 20, 30, 40]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
+            :total="total">
+        </el-pagination>
+    </div>
+    </div>
+    <script>
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    tableData: [], // 当前展示数据
+                    tableHeight: 600, // 表格高度
+                    total: 0, // 数据总条数
+                    currentPage: 1, // 当前页码
+                    pageSize: 10 // 每页的数据条数
+                }
+            },
+            components: {
+
+            },
+            watch: {
+
+            },
+            methods: {
+                exportToExcel() {
+                    // 像素转换为磅数，该处使用想对通用但不正确的公式
+                    function px2pt(px) {
+                        /* 
+                            像素与磅数的转换关系
+                            八号＝5磅(7px) ==(5/72)*96=6.67 =6px
+                            七号＝5.5磅 ==(5.5/72)*96=7.3 =7px
+                            小六＝6.5磅 ==(6.5/72)*96=8.67 =8px
+                            六号＝7.5磅 ==(7.5/72)*96=10px
+                            小五＝9磅 ==(9/72)*96=12px
+                            五号＝10.5磅 ==(10.5/72)*96=14px
+                            小四＝12磅 ==(12/72)*96=16px
+                            四号＝14磅 ==(14/72)*96=18.67 =18px
+                            小三＝15磅 ==(15/72)*96=20px
+                            三号＝16磅 ==(16/72)*96=21.3 =21px
+                            小二＝18磅 ==(18/72)*96=24px
+                            二号＝22磅 ==(22/72)*96=29.3 =29px
+                            小一＝24磅 ==(24/72)*96=32px
+                            一号＝26磅 ==(26/72)*96=34.67 =34px
+                            小初＝36磅 ==(36/72)*96=48px
+                            初号＝42磅 ==(42/72)*96=56px
+                        */
+                        return px * 0.75;
+                    }
+                    // console.log(this.$refs.rw_table.$el)
+                    try {
+                        let table = this.$refs.rw_table.$el;
+                        let gutlen = table.querySelectorAll('.gutter').length;
+                        for (let i = 0; i < gutlen; i++) {
+                            table.querySelector('.gutter').remove();
+                        }
+                        
+                        let wb = XLSX.utils.table_to_book(table, { raw: true });
+                        let sheet = wb.SheetNames[0];
+                        function utilsTest(wb) {
+                            // 设置列宽
+                            let body = table.querySelector('.el-table__body-wrapper .el-table__row');
+                            let columns = body.querySelectorAll('td');
+                            let cols = [];
+                            for (let i = 0; i < columns.length; i++) {
+                                cols.push({ wpx: px2pt(columns[i].clientWidth) });
+                            }
+                            XSU.setColWidth(wb, sheet, cols);
+
+                            // 动态生成列号[A-Z,AA-AZ,...]，通过ASCII与字符串之间的转换实现
+                            let letterArr = [];
+                            for (let i = 0; i < wb.Sheets.Sheet1['!cols'].length; i++) {
+                                let data = (parseInt(i / 26) ? String.fromCharCode(parseInt(i / 26) - 1 + 65) : "") + String.fromCharCode(parseInt(i % 26) + 65);
+                                letterArr.push(data);
+                            }
+
+                            // 填充单元格样式
+                            let currentCol = 0;
+                            let currentRow = 0;
+                            function fillCell(style) {
+                                let cellPos = letterArr[currentCol] + (currentRow + 1); // 拼接得到单元格位置，如："A1"
+                                // 换行判断，单位格位置是否存在
+                                if (letterArr[currentCol] === undefined) {
+                                    currentCol = 0;
+                                    currentRow ++;
+                                    fillCell(style);
+                                } else {
+                                    if (wb.Sheets.Sheet1[cellPos]) {
+                                        // console.log(color, i, cellPos);
+                                        // 设置背景色
+                                        XSU.setFillFgColor(wb, sheet, cellPos, { rgb: style.bgColor });
+                                        // 前景色
+                                        // XSU.setFillFgColor(wb, sheet, cellPos, { rgb: style.bgColor });
+                                        // 设置字体颜色
+                                        XSU.setFontColor(wb, sheet, cellPos, { rgb: style.color });
+                                        // 设置字体
+                                        // XSU.setFontType(wb, sheet, cellPos, style.fontFamily);
+                                        // 设置字体大小
+                                        XSU.setFontSize(wb, sheet, cellPos, style.fontSize);
+                                        // 设置边框
+                                        // XSU.setBorderStyles(wb, sheet, cellPos, style.borderStyles);
+                                        // var styles = {
+                                        //     top: { style:"thin", color: "FFFFAA00"},
+                                        //     bottom: { style:"thin", color: "FFFFAA00"},
+                                        //     left: { style:"thin", color: "FFFFAA00"},
+                                        //     right: { style:"thin", color: "FFFFFF00"}
+                                        // }
+                                        // XSU.setBorderStyles(wb, sheet, cellPos, styles);
+                                        currentCol ++;
+                                    } else {
+                                        // 若当前列不存在
+                                        currentCol ++;
+                                        if (currentCol <= letterArr.length) {
+                                            fillCell(style);
+                                        }
+                                    }
+                                }
+                            }
+
+                            let cellList = document.querySelectorAll('.el-table__cell');
+                            // console.log(cellList);
+                            for (let i = 0; i < cellList.length; i++) {
+                                if (cellList[i].className.indexOf('gutter') === -1) {
+                                    let computedStyle = getComputedStyle(cellList[i]);
+                                    let style = {
+                                        bgColor: computedStyle.backgroundColor.colorHex().substr(1),
+                                        color: computedStyle.color.colorHex().substr(1),
+                                        fontSize: px2pt(parseInt(computedStyle.fontSize.substr(0, 2))), // 截取100以下字体大小
+                                        // fontFamily: computedStyle.fontFamily.substr(1, computedStyle.fontFamily.length - 2),
+                                        borderBottom: computedStyle.borderBottom,
+                                        // borderStyles: {style: 'thin', color: }
+                                    }
+                                    fillCell(style);
+                                }
+                            }
+
+                            // 整体样式设置
+                            XSU.setAlignmentHorizontalAll(wb, sheet, 'center');
+                            XSU.setAlignmentVerticalAll(wb, sheet, 'center');
+                            XSU.setAlignmentWrapTextAll(wb, sheet, true);
+                            XSU.setBorderDefaultAll(wb, sheet);
+                            // 设置字体
+                            XSU.setFontTypeAll(wb, sheet, 'Microsoft YaHei');
+
+                            
+                        }
+                        utilsTest(wb);
+                        let wbout = xlsxStyle.write(wb, { bookType: "xlsx", bookSST: false, type: "binary" });
+                        saveAs(new Blob([XSU.s2ab(wbout)], { type: "application/octet-stream" }), 'export.xlsx')
+                    } catch (e) {
+                        "undefined" != typeof console && console.error(e)
+                    }
+                },
+                setData() {
+                    for (let i = 0; i < 50; i++) {
+                        let obj = {
+                            date: this.randomDate(),
+                            name: '王小虎' + i,
+                            province: '上海' + i,
+                            city: '普陀区' + i,
+                            address: '上海市普陀区金\n\t\r沙江路 1518 弄' + i,
+                            zip: 200333 + i
+                        }
+                        this.tableData.push(obj);
+                    }
+                    this.total = this.tableData.length;
+                },
+                handleSizeChange(val) {
+                    console.log(`每页 ${val} 条`);
+                    this.currentPage = 1;
+                    this.pageSize = val;
+                },
+                handleCurrentChange(val) {
+                    console.log(`当前页: ${val}`);
+                    this.currentPage = val;
+                },
+
+                // 随机日期生成
+                randomDate() {
+                    var startDate = new Date(2012, 0, 1).getTime();
+                    var endDate = new Date(2015, 0, 1).getTime();
+                    var spaces = (endDate - startDate);
+                    var timestamp = Math.round(Math.random() * spaces);
+                    timestamp += startDate;
+                    return this.formatDate(new Date(timestamp));
+                },
+                formatDate(date) {
+                    var month = date.getMonth() + 1;
+                    var day = date.getDate();
+                    month = month < 10 ? '0' + month : month;
+                    day = day < 10 ? '0' + day : day;
+                    return String(date.getFullYear()) + '-' + month + '-' + day;
+                }
+            },
+            mounted() {
+                this.setData();
+            }
+        })
+    </script>
+</body>
+
+</html>
