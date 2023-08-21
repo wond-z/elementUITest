@@ -57,10 +57,12 @@
 
 <body>
     <div id="app">
-        <el-button @click="exportToExcel">导出表格</el-button>
+        <el-button @click="exportToExcel">导出表格（带样式）</el-button>
+        <el-button @click="exportToExcel2">导出表格（纯数据）</el-button>
+        <br><br>
         <el-table ref="rw_table" :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)"
             :height="tableHeight">
-            <el-table-column type="index" width="50"></el-table-column>
+            <!-- <el-table-column type="index" width="50"></el-table-column> -->
             <el-table-column label="信息">
                 <el-table-column prop="date" label="日期" width="150"></el-table-column>
                 <el-table-column prop="name" label="姓名" width="120"></el-table-column>
@@ -68,9 +70,9 @@
                 <el-table-column prop="city" label="市区" width="120"></el-table-column>
             </el-table-column>
             <el-table-column prop="address" label="地址" width="300"></el-table-column>
-            <el-table-column prop="address" label="地址" width="100"></el-table-column>
+            <!-- <el-table-column prop="address" label="地址" width="100"></el-table-column>
             <el-table-column prop="address" label="地址" width="300"></el-table-column>
-            <el-table-column prop="address" label="地址" width="300"></el-table-column>
+            <el-table-column prop="address" label="地址" width="300"></el-table-column> -->
             <el-table-column prop="zip" label="邮编"></el-table-column>
         </el-table>
         <div class="block" style="margin-top:15px;"></div>
@@ -130,7 +132,7 @@
                         for (let i = 0; i < gutlen; i++) {
                             table.querySelector('.gutter').remove();
                         }
-                        
+
                         let wb = XLSX.utils.table_to_book(table, { raw: true });
                         let sheet = wb.SheetNames[0];
                         function utilsTest(wb) {
@@ -217,8 +219,6 @@
                             XSU.setBorderDefaultAll(wb, sheet);
                             // 设置字体
                             XSU.setFontTypeAll(wb, sheet, 'Microsoft YaHei');
-
-                            
                         }
                         utilsTest(wb);
                         let wbout = xlsxStyle.write(wb, { bookType: "xlsx", bookSST: false, type: "binary" });
@@ -227,6 +227,43 @@
                         "undefined" != typeof console && console.error(e)
                     }
                 },
+                exportToExcel2() {
+                    const headerData =[
+                        {
+                            date: '信息',
+                            name: '',
+                            province: '',
+                            city: '',
+                            address: '地址',
+                            zip: '邮编'
+                        },
+                        {
+                            date: '日期',
+                            name: '姓名',
+                            province: '省份',
+                            city: '市区',
+                            address: '',
+                            zip: ''
+                        }
+                    ];
+                    var data = headerData.concat(this.tableData);
+
+                    let table = this.$refs.rw_table.$el;
+                    // let gutlen = table.querySelectorAll('.gutter').length;
+                    // for (let i = 0; i < gutlen; i++) {
+                    //     table.querySelector('.gutter').remove();
+                    // }
+
+                    let tableSheet = XLSX.utils.table_to_sheet(table);
+                    
+                    const wb = XLSX.utils.book_new();
+                    let ws = XLSX.utils.json_to_sheet(data, { skipHeader: true });
+                    // 单元格合并（针对表头）
+                    ws['!merges'] = tableSheet['!merges'];
+                    console.log(ws)
+                    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+                    XLSX.writeFile(wb, '导出.xlsx')
+                },
                 setData() {
                     for (let i = 0; i < 50; i++) {
                         let obj = {
@@ -234,7 +271,7 @@
                             name: '王小虎' + i,
                             province: '上海' + i,
                             city: '普陀区' + i,
-                            address: '上海市普陀区金\n\t\r沙江路 1518 弄' + i,
+                            address: '上海市普陀区金沙江路 1518 弄' + i,
                             zip: 200333 + i
                         }
                         this.tableData.push(obj);
