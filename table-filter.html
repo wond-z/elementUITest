@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./lib/element-ui/lib/theme-chalk/index.css" />
+    <script src="./lib/vue.min.js"></script>
+    <script src="./lib/element-ui/lib/index.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <el-table ref="rw_table" :data="tableData | dataslice(currentPage, pageSize)"
+            :height="tableHeight" @filter-change="filterChange">
+            <el-table-column type="index" width="50"></el-table-column>
+            <el-table-column prop="date" label="日期" width="150" column-key="date"
+                :filters="filters ? Tfilters('date') : null"></el-table-column>
+            <el-table-column prop="name" label="姓名" width="120">
+            </el-table-column>
+            <el-table-column prop="province" label="省份" width="120"></el-table-column>
+            <el-table-column prop="city" label="市区" width="120"></el-table-column>
+            <el-table-column prop="address" label="地址" width="300"></el-table-column>
+            <el-table-column prop="address" label="地址" width="300"></el-table-column>
+            <el-table-column prop="address" label="地址" width="300"></el-table-column>
+            <el-table-column prop="address" label="地址" width="300"></el-table-column>
+            <el-table-column prop="zip" label="邮编" width="120"></el-table-column>
+        </el-table>
+        <div class="block" style="margin-top:15px;"></div>
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
+            :page-sizes="[10, 20, 30, 40]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
+            :total="total">
+        </el-pagination>
+    </div>
+    </div>
+    <script>
+        new Vue({
+            el: '#app',
+            // 过滤器
+            filters: {
+                dataslice(array, page, limit) {
+                    const offset = (page - 1) * limit;
+                    const newdata = offset + limit >= array.length ? array.slice(offset, array.length) : array.slice(offset, offset + limit);
+                    return newdata;
+                }
+            },
+
+            data() {
+                return {
+                    tData: [], // 请求到数据后tabledata和tData都要进行赋值,
+                    tableData: [], // 当前展示数据
+                    tableHeight: 528, // 表格高度
+                    total: 0, // 数据总条数
+                    currentPage: 1, // 当前页码
+                    pageSize: 10, // 每页的数据条数
+                    // 不需要过滤的项需设置为null
+                    filters: [],
+                    filtList: []
+                }
+            },
+            components: {
+
+            },
+            watch: {
+
+            },
+            computed: {
+                /* 筛选的下拉选择项进行获取 */
+                Tfilters() {
+                    return (prop) => {
+                        let lis = [];
+                        const flis = [];
+                        this.tableData.forEach(item => {
+                            lis.push(item[prop]);
+                        })
+                        lis = Array.from(new Set(lis));
+                        lis.forEach(item => {
+                            const obj = {}
+                            obj.text = item;
+                            obj.value = item;
+                            flis.push(obj);
+                        })
+                        return flis;
+                    }
+                }
+            },
+
+            methods: {
+                // 随机日期生成
+                randomDate() {
+                    var startDate = new Date(2023, 9, 10).getTime();
+                    var endDate = new Date(2023, 9, 15).getTime();
+                    var spaces = (endDate - startDate);
+                    var timestamp = Math.round(Math.random() * spaces);
+                    timestamp += startDate;
+                    return this.formatDate(new Date(timestamp));
+                },
+                formatDate(date) {
+                    var month = date.getMonth() + 1;
+                    var day = date.getDate();
+                    month = month < 10 ? '0' + month : month;
+                    day = day < 10 ? '0' + day : day;
+                    return String(date.getFullYear()) + '-' + month + '-' + day;
+                },
+                setData() {
+                    var self = this;
+                    for (let i = 0; i < 100; i++) {
+                        let obj = {
+                            date: this.randomDate(),
+                            name: '王小虎' + i,
+                            province: '上海' + i,
+                            city: '普陀区' + i,
+                            address: '上海市普陀区金沙江路 1518 弄' + i,
+                            zip: 200333 + i
+                        }
+                        self.tableData.push(obj);
+                        self.tData.push(obj);
+                    }
+                    this.total = self.tableData.length;
+                },
+                // 分页
+                handleSizeChange(val) {
+                    console.log(`每页 ${val} 条`);
+                    this.currentPage = 1;
+                    this.pageSize = val;
+                },
+                handleCurrentChange(val) {
+                    console.log(`当前页: ${val}`);
+                    this.currentPage = val;
+                },
+                // filterHandler(value, row, column) {
+                //     const property = column['property'];
+                //     return row[property] === value;
+                // },
+                // 所有数据过滤
+                filterChange(filters) {
+                    const lis = Object.values(filters)[0];
+                    const key = Object.keys(filters)[0];
+
+                    /* 将筛选条件添加到数组中 */
+                    if (this.filtList.length === 0) {
+                        this.filtList.push(filters);
+                    } else {
+                        const index = this.filtList.findIndex((item) => key in item);
+                        if (index !== -1) {
+                            this.filtList.splice(index, 1, filters);
+                        } else {
+                            this.filtList.push(filters);
+                        }
+                    }
+
+                    /* 筛选按钮进行筛选 */
+                    if (lis.length > 0) {
+                        this.tableData = this.tableData.filter(data => {
+                            return lis.includes(data[key])
+                        })
+                        this.total = this.tableData.length;
+                        return this.tableData;
+                    }
+
+                    /* 点击了重置按钮 */
+                    this.tableData = this.tData // 先拿到所有的数据
+
+                    // 把当前重置的数据过滤掉
+                    this.filtList = this.filtList.filter(item => Object.values(item)[0].length !== 0);
+                    // 如果数组中还有筛选条件，进一步进行筛选
+                    if (this.filtList.length > 0) {
+                        this.filtList.forEach(item => {
+                            const lis = Object.values(item)[0];
+                            const key = Object.keys(item)[0];
+                            this.tableData = this.tableData.filter(data => {
+                                return lis.includes(data[key]);
+                            });
+                        });
+                        this.total = this.tableData.length;
+                        return this.tableData;
+                    }
+                    // 筛选数组中没有数据了，拿到全部数据
+                    this.tableData = this.tData;
+                    this.total = this.tableData.length;
+                    return this.tableData;
+                }
+            },
+            mounted() {
+                this.setData();
+            }
+        })
+    </script>
+</body>
+
+</html>
