@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./lib/element-ui/lib/theme-chalk/index.css" />
+    <script src="./lib/vue.min.js"></script>
+    <script src="./lib/element-ui/lib/index.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div class="block">
+            <span class="demonstration">周</span>
+            <el-date-picker v-model="value1" type="week" format="yyyy 第 WW 周" :picker-options="pickerOptions"
+                placeholder="选择周">
+            </el-date-picker>
+        </div>
+        <div class="block">
+            <span class="demonstration">月</span>
+            <el-date-picker v-model="value2" type="month" placeholder="选择月">
+            </el-date-picker>
+        </div>
+        <div class="block">
+            <span class="demonstration">年</span>
+            <el-date-picker v-model="value3" type="year" placeholder="选择年">
+            </el-date-picker>
+        </div>
+        <div class="block">
+            <span class="demonstration">多个日期</span>
+            <el-date-picker type="dates" v-model="value4" placeholder="选择一个或多个日期">
+            </el-date-picker>
+        </div>
+        <div class="block">
+            <span class="demonstration">多个月</span>
+            <el-date-picker type="months" v-model="value5" placeholder="选择一个或多个月">
+            </el-date-picker>
+        </div>
+        <div class="block">
+            <span class="demonstration">多个年</span>
+            <el-date-picker type="years" v-model="value6" placeholder="选择一个或多个年">
+            </el-date-picker>
+        </div>
+    </div>
+    <script>
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    value1: '',
+                    value2: '',
+                    value3: '',
+                    value4: '',
+                    value5: '',
+                    value6: '',
+                    pickerOptions: {
+                        firstDayOfWeek: 7
+                    }
+                };
+            },
+            methods: {
+
+            },
+            watch: {
+                value1: {
+                    handler(nv, ov) {
+                        console.log(nv);
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

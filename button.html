@@ -3,14 +3,16 @@
 
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-    <script src="https://unpkg.com/vue/dist/vue.js"></script>
-	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <link rel="stylesheet" href="./lib/element-ui/lib/theme-chalk/index.css" />
+    <script src="./lib/vue.min.js"></script>
+    <script src="./lib/element-ui/lib/index.js"></script>
 </head>
 
 <body>
     <div id="app">
-        <el-button @click="visible = true">Button</el-button>
+        <el-button ref="button" @click="onClick">Button</el-button>
+        <el-button ref="button1" @click="onClick">Button</el-button>
+        <el-button ref="button2" @click="onClick">Button</el-button>
         <el-dialog :visible.sync="visible" title="Hello world">
             <p>Try Element</p>
         </el-dialog>
@@ -20,7 +22,14 @@
 		    el: '#app',
 		    data: function() {
 		        return { visible: false }
-		    }
+		    },
+            methods: {
+                onClick() {
+                    console.log(this);
+                    this.$refs.button.disabled = true;
+                    this.$refs.button.loading = true;
+                }
+            }
 		})
 	</script>
 </body>
