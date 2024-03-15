@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./lib/element-ui/lib/theme-chalk/index.css" />
+    <script src="./lib/vue.min.js"></script>
+    <script src="./lib/element-ui/lib/index.js"></script>
+    <style type="text/css">
+        html, body {
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+        #app {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <el-table ref="rw_table" :data="tableData" :height="tableHeight">
+            <el-table-column prop="date" label="日期" width="200"></el-table-column>
+            <el-table-column prop="name" label="姓名" width="200"></el-table-column>
+            <el-table-column prop="province" label="省份" width="120"></el-table-column>
+            <el-table-column prop="city" label="市区" width="120"></el-table-column>
+            <el-table-column prop="address" label="地址" width="300"></el-table-column>
+            <el-table-column prop="address" label="地址" width="300"></el-table-column>
+            <el-table-column prop="address" label="地址" width="300"></el-table-column>
+            <el-table-column prop="address" label="地址" width="300"></el-table-column>
+            <el-table-column prop="zip" label="邮编" width="120"></el-table-column>
+        </el-table>
+    </div>
+    <script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                tableData: [],
+                tableHeight: '100%'
+            }
+        },
+        components: {
+
+        },
+        watch: {
+
+        },
+        methods: {
+            setData() {
+                var self = this;
+                for (let i = 0; i < 100; i++) {
+                    let obj = {
+                        date: '2016-05-03' + i,
+                        name: '王小虎' + i,
+                        province: '上海' + i,
+                        city: '普陀区' + i,
+                        address: '上海市普陀区金沙江路 1518 弄' + i,
+                        zip: 200333 + i
+                    }
+                    self.tableData.push(obj);
+                }
+            },
+        },
+        mounted() {
+            this.setData();
+        }
+    })
+    </script>
+</body>
+
+</html>
