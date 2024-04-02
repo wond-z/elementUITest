@@ -11,24 +11,24 @@
 <body>
     <div id="app">
         <div class="block">
+            <span class="demonstration">日期</span>
+            <el-date-picker type="dates" v-model="value1" placeholder="选择一个或多个日期">
+            </el-date-picker>
+        </div>
+        <div class="block">
+            <span class="demonstration">多个日期</span>
+            <el-date-picker type="date" v-model="value2" placeholder="选择一个或多个日期">
+            </el-date-picker>
+        </div>
+        <div class="block">
             <span class="demonstration">周</span>
-            <el-date-picker v-model="value1" type="week" format="yyyy 第 WW 周" :picker-options="pickerOptions"
+            <el-date-picker v-model="value3" type="week" format="yyyy 第 WW 周" :picker-options="pickerOptions"
                 placeholder="选择周">
             </el-date-picker>
         </div>
         <div class="block">
             <span class="demonstration">月</span>
-            <el-date-picker v-model="value2" type="month" placeholder="选择月">
-            </el-date-picker>
-        </div>
-        <div class="block">
-            <span class="demonstration">年</span>
-            <el-date-picker v-model="value3" type="year" placeholder="选择年">
-            </el-date-picker>
-        </div>
-        <div class="block">
-            <span class="demonstration">多个日期</span>
-            <el-date-picker type="dates" v-model="value4" placeholder="选择一个或多个日期">
+            <el-date-picker v-model="value4" type="month" placeholder="选择月">
             </el-date-picker>
         </div>
         <div class="block">
@@ -37,8 +37,33 @@
             </el-date-picker>
         </div>
         <div class="block">
+            <span class="demonstration">年</span>
+            <el-date-picker v-model="value6" type="year" placeholder="选择年">
+            </el-date-picker>
+        </div>
+        <div class="block">
             <span class="demonstration">多个年</span>
-            <el-date-picker type="years" v-model="value6" placeholder="选择一个或多个年">
+            <el-date-picker type="years" v-model="value7" placeholder="选择一个或多个年">
+            </el-date-picker>
+        </div>
+        <div class="block">
+            <span class="demonstration">日期时间</span>
+            <el-date-picker type="datetime" v-model="value8" placeholder="选择一个或多个年">
+            </el-date-picker>
+        </div>
+        <div class="block">
+            <span class="demonstration">日期时间区间</span>
+            <el-date-picker type="datetimerange" v-model="value9" placeholder="选择一个或多个年">
+            </el-date-picker>
+        </div>
+        <div class="block">
+            <span class="demonstration">日期区间</span>
+            <el-date-picker type="daterange" v-model="value10" placeholder="选择一个或多个年">
+            </el-date-picker>
+        </div>
+        <div class="block">
+            <span class="demonstration">月区间</span>
+            <el-date-picker type="monthrange" v-model="value11" placeholder="选择一个或多个年">
             </el-date-picker>
         </div>
     </div>
@@ -53,6 +78,11 @@
                     value4: '',
                     value5: '',
                     value6: '',
+                    value7: '',
+                    value8: '',
+                    value9: '',
+                    value10: '',
+                    value11: '',
                     pickerOptions: {
                         firstDayOfWeek: 7
                     }
