@@ -24,6 +24,7 @@
         </el-table>
         <div class="block" style="margin-top:15px;"></div>
             <el-pagination
+                ref="pagination"
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
                 :current-page="currentPage"
