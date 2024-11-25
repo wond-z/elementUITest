@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="./lib/element-ui/lib/theme-chalk/index.css" />
+    <script src="./lib/vue.min.js"></script>
+    <script src="./lib/element-ui/lib/index.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <el-color-picker v-model="color" color-format="hex"></el-color-picker>
+    </div>
+</body>
+
+<script>
+    new Vue({
+        el: "#app",
+        data() {
+            return {
+                color: '#409EFF'
+            }
+        },
+        methods: {
+
+        }
+    });
+</script>
+
+</html>
